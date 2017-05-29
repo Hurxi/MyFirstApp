@@ -67,6 +67,8 @@
             android:name="UMENG_APPKEY"
             android:value="59126d14677baa49c4001fc0" />
 
+        <activity android:name=".CityActivity" />
+        <activity android:name=".SelectCityActivity"></activity>
     </application>
 
 </manifest>

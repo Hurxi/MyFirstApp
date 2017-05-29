@@ -1,5 +1,6 @@
 package com.example.myfirstapp.fragment;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -14,11 +15,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.myfirstapp.CityActivity;
 import com.example.myfirstapp.R;
 import com.example.myfirstapp.adapter.TianqiDailyRVAdapter;
 import com.example.myfirstapp.bean.WeatherDailyResponse;
@@ -52,6 +55,8 @@ public class TianqiFragment extends Fragment {
     TextView tvLvyou,tvGanmao,tvXiche,tvChuanyi,tvZiwaixian,tvYundong;
     RecyclerView rvDaily;
     ImageView ivName;
+    ImageButton ibCity;
+    private String city="江苏淮安";
     private TianqiDailyRVAdapter adapter;
     private List<WeatherDailyResponse.ResultsBean.DailyBean> dailyBeanList;
     @Nullable
@@ -84,14 +89,21 @@ public class TianqiFragment extends Fragment {
         tvYundong=(TextView)view.findViewById(R.id.tv_yundong_tianqi);
         ivName=(ImageView)view.findViewById(R.id.iv_name_tianqi);
         rvDaily=(RecyclerView)view.findViewById(R.id.rv_deily_tianqi);
-
+        ibCity=(ImageButton)view.findViewById(R.id.ib_city_tianqi);
+        ibCity.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(getContext(), CityActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void getDate() {
         OkGo.get(JuheApi.WEATHER_NOW)
                 .tag(this)
                 .params("key",KeyValue.KEY_TIANQI)
-                .params("location","江苏淮安")
+                .params("location",city)
                 .execute(new StringCallback() {
                     @Override
                     public void onSuccess(String s, Call call, Response response) {
@@ -122,7 +134,7 @@ public class TianqiFragment extends Fragment {
         OkGo.get(JuheApi.WEATHER_DAILY)
                 .tag(this)
                 .params("key",KeyValue.KEY_TIANQI)
-                .params("location","江苏淮安")
+                .params("location",city)
                 .params("start",-1)
                 .execute(new StringCallback() {
                     @Override
@@ -162,7 +174,7 @@ public class TianqiFragment extends Fragment {
         OkGo.get(JuheApi.WEATHER_LIFE)
                 .tag(this)
                 .params("key",KeyValue.KEY_TIANQI)
-                .params("location","江苏淮安")
+                .params("location",city)
                 .execute(new StringCallback() {
                     @Override
                     public void onSuccess(String s, Call call, Response response) {
@@ -176,6 +188,7 @@ public class TianqiFragment extends Fragment {
                         tvChuanyi.setText(suggestionBean.getDressing().getBrief());
                         tvZiwaixian.setText(suggestionBean.getUv().getBrief());
                         tvYundong.setText(suggestionBean.getSport().getBrief());
+
                     }
                 });
 

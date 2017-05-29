@@ -22,7 +22,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.myfirstapp.CityActivity;
+import com.example.myfirstapp.MessageEvent;
 import com.example.myfirstapp.R;
+import com.example.myfirstapp.SelectCityActivity;
 import com.example.myfirstapp.adapter.TianqiDailyRVAdapter;
 import com.example.myfirstapp.bean.WeatherDailyResponse;
 import com.example.myfirstapp.bean.WeatherLifeResponse;
@@ -37,6 +39,9 @@ import com.lzy.okgo.callback.StringCallback;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.greenrobot.event.EventBus;
+import de.greenrobot.event.Subscribe;
+import de.greenrobot.event.ThreadMode;
 import okhttp3.Call;
 import okhttp3.Response;
 
@@ -71,7 +76,7 @@ public class TianqiFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         weaherNowList = new ArrayList<>();
         dailyBeanList=new ArrayList<>();
-        getDate();
+
 
         tvName =(TextView)view.findViewById(R.id.tv_name_tianqi);
         tvWind =(TextView)view.findViewById(R.id.tv_wind_num_tianqi);
@@ -93,12 +98,19 @@ public class TianqiFragment extends Fragment {
         ibCity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(getContext(), CityActivity.class);
+                Intent intent=new Intent(getContext(), SelectCityActivity.class);
                 startActivity(intent);
             }
         });
+        getDate();
     }
-
+    @Subscribe(threadMode = ThreadMode.MainThread)
+    public void helloEventBus(MessageEvent message) {
+        city=message.password;
+//        Toast.makeText(getContext(), ""+city, Toast.LENGTH_SHORT).show();
+        getDate();
+//        Toast.makeText(getContext(), ""+message.password, Toast.LENGTH_SHORT).show();
+    }
     private void getDate() {
         OkGo.get(JuheApi.WEATHER_NOW)
                 .tag(this)
@@ -110,7 +122,7 @@ public class TianqiFragment extends Fragment {
                         Log.d("s=",s);
                         Gson gson=new Gson();
                         WeatherNowResponse a=gson.fromJson(s,WeatherNowResponse.class);
-
+                        weaherNowList.clear();
                         weaherNowList.addAll(a.getResults());
 //                        a.getResults().get(0).getNow();
 //                        a.getResults().get(0).getLocation();
@@ -143,6 +155,7 @@ public class TianqiFragment extends Fragment {
                         Gson gson=new Gson();
                         WeatherDailyResponse weatherDailyResponse=gson
                                 .fromJson(s,WeatherDailyResponse.class);
+                        dailyBeanList.clear();
                         dailyBeanList = weatherDailyResponse.getResults().get(0).getDaily();
                         int oldTem=Integer.parseInt(weatherDailyResponse.getResults().get(0).getDaily().get(0).getHigh());
                         int nowTem=Integer.parseInt(weatherDailyResponse.getResults().get(0).getDaily().get(1).getHigh());
@@ -192,5 +205,17 @@ public class TianqiFragment extends Fragment {
                     }
                 });
 
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 }

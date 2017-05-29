@@ -13,15 +13,19 @@ import com.example.myfirstapp.bean.ProvinceBean;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.greenrobot.event.EventBus;
+
 public class SelectCityActivity extends AppCompatActivity {
     final List<ProvinceBean> options1Items=new ArrayList<ProvinceBean>();
     final List<List<String>> options2Items=new ArrayList<List<String>>();
     final List<List<List<ProvinceBean>>> options3Items=new ArrayList<List<List<ProvinceBean>>>();
     LinearLayout ll;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_city);
+
         ll=(LinearLayout)findViewById(R.id.ll);
         initOptionData();
         OptionsPickerView pvOptions = new  OptionsPickerView.Builder(this, new OptionsPickerView.OnOptionsSelectListener() {
@@ -32,7 +36,10 @@ public class SelectCityActivity extends AppCompatActivity {
 
                 String tx = options1Items.get(options1).getPickerViewText()
                         + options2Items.get(options1).get(option2);
-                Toast.makeText(SelectCityActivity.this, ""+tx, Toast.LENGTH_SHORT).show();
+//                Toast.makeText(SelectCityActivity.this, ""+, Toast.LENGTH_SHORT).show();
+//                String json="";
+                EventBus.getDefault().post(new MessageEvent("hello",tx));
+                finish();
             }
         })
                 .setDecorView(ll)
@@ -152,5 +159,9 @@ public class SelectCityActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
 
+    }
 }
